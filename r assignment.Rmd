@@ -1,0 +1,77 @@
+```{r}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tidyr)
+```
+
+```{r}
+file_path <-"C:\\Users\\arthu\\OneDrive\\Desktop\\Book2.csv"
+df <- read.csv(file_path)
+print(head(df))
+```
+```{r}
+# Basic summary statistics
+summary(file_path)
+str(file_path)
+```
+
+```{r}
+# Assuming 'data' is your loaded dataset
+# Top-Selling Pizzas
+top_selling_pizzas <- Book2 %>%
+  group_by(pizza_name) %>%
+  summarise(total_quantity = sum(quantity))%>%
+  arrange(desc(total_quantity))
+
+ggplot(top_selling_pizzas[1:10,], aes(x = reorder(pizza_name, -total_quantity), y = total_quantity)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Top 10 Selling Pizzas",
+       x = "Pizza",
+       y = "Total Quantity Sold") +
+  theme_minimal()
+
+```
+
+```{r}
+# Peak Sales Hours
+Book2$order_time <- hms::as_hms(Book2$order_time)
+Book2$order_hour <- hour(Book2$order_time)
+
+sales_by_hour <- Book2 %>%
+  group_by(order_hour) %>%
+  summarise(total_sales = sum(total_price))
+
+ggplot(sales_by_hour, aes(x = order_hour, y = total_sales)) +
+  geom_line() +
+  labs(title = "Total Pizza Sales by Hour",
+       x = "Hour of the Day",
+       y = "Total Sales") +
+  theme_minimal()
+```
+
+```{r}
+# Revenue by Pizza Category
+revenue_by_category <- Book2 %>%
+  group_by(pizza_category) %>%
+  summarise(total_revenue = sum(total_price)) %>%
+  arrange(desc(total_revenue))
+
+ggplot(revenue_by_category, aes(x = reorder(pizza_category, -total_revenue), y = total_revenue)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  coord_flip() +
+  labs(title = "Revenue by Pizza Category",
+       x = "Pizza Category",
+       y = "Total Revenue") +
+  theme_minimal()
+```
+```{r}
+# Average pizza id
+average_pizza_id <- Book2 %>%
+  group_by(pizza_id) %>%
+  summarise(pizza_id = sum(total_price)) %>%
+  summarise(average_value = mean(pizza_id))
+
+print(paste("Average Order Value: $", round(average_pizza_id$average_value, 2), sep = ""))
+```
